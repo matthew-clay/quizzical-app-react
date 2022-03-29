@@ -3,20 +3,20 @@ function Post(props) {
 
   const createQuestionPost = quiz.map((item) => {
     return (
-      <div className="quiz-post">
+      <div className="quiz-post" key={item.id}>
         <span className="question">{item.question}</span>
         <ul className="answers">
           <li className="answer-list" onClick={handleChoice}>
-            {item.incorrect_answers[0]}
+            {item.incorrectAnswer[0]}
           </li>
           <li className="answer-list" onClick={handleChoice}>
-            {item.incorrect_answers[1]}
+            {item.incorrectAnswer[1]}
           </li>
           <li className="answer-list" onClick={handleChoice}>
-            {item.correct_answer}
+            {item.correctAnswer}
           </li>
           <li className="answer-list" onClick={handleChoice}>
-            {item.incorrect_answers[2]}
+            {item.incorrectAnswer[2]}
           </li>
         </ul>
       </div>
