@@ -1,24 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import { nanoid } from "nanoid";
+import { useEffect, useState } from "react";
+import "./App.css";
+import Preview from "./component/Preview";
+import Quiz from "./component/Quiz";
 
 function App() {
+  const [isStart, setStart] = useState(false);
+
+  const handleStart = () => {
+    setStart((prevValue) => !prevValue);
+  };
+
+  if (isStart) {
+    document.querySelector(".preview").style.display = "none";
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main>
+      <div className="container">
+        <Preview handleStart={handleStart} />
+        {isStart && <Quiz />}
+      </div>
+    </main>
   );
 }
 
