@@ -1,28 +1,18 @@
 import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
 import "./App.css";
-import Preview from "./component/Preview";
+import Welcome from "./component/Welcome";
 import Quiz from "./component/Quiz";
 
 function App() {
-  const [isStart, setStart] = useState(false);
+  const [welcome, setWelcome] = useState(true);
 
+  // function for welcome page...
   const handleStart = () => {
-    setStart((prevValue) => !prevValue);
+    setWelcome((prevValue) => !prevValue);
   };
 
-  if (isStart) {
-    document.querySelector(".preview").style.display = "none";
-  }
-
-  return (
-    <main>
-      <div className="container">
-        <Preview handleStart={handleStart} />
-        {isStart && <Quiz />}
-      </div>
-    </main>
-  );
+  return <main>{welcome && <Welcome handleStart={handleStart} />}</main>;
 }
 
 export default App;
