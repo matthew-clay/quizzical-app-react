@@ -1,7 +1,12 @@
 function Answer(props) {
   const generateAnswer = props.answers.map((element) => {
     return (
-      <li className="answer-list" key={element.id}>
+      <li
+        id={element.id}
+        className="answer-list"
+        key={element.id}
+        onClick={() => props.holdAnswer(element.id)}
+      >
         {element.answer}
       </li>
     );
