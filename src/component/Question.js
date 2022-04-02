@@ -1,5 +1,9 @@
 function Question(props) {
-  return console.log("question props:", props);
+  return (
+    <span className="question" key={props.id}>
+      {props.question}
+    </span>
+  );
 }
 
 export default Question;

@@ -12,7 +12,7 @@ font-family: 'Karla', sans-serif;
   font-family: "Karla", sans-serif;
 }
 
-main {
+section {
   height: 100vh;
   border-radius: 10px;
   display: flex;
@@ -72,7 +72,7 @@ main {
 }
 
 .quiz-post {
-  padding: 15px 0px;
+  padding: 10px 0px;
   border-bottom: 0.8px solid #dbdef0;
 }
 
@@ -86,14 +86,15 @@ main {
 .answers {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
-  cursor: pointer;
   padding: 12px;
 }
 
 li {
   list-style: none;
+  cursor: pointer;
+  user-select: none;
 }
 
 .answer-list {
@@ -101,7 +102,7 @@ li {
   border: 1.3px solid #293264;
   border-radius: 10px;
   padding: 7px 20px;
-  margin: 15px;
+  margin: 10px;
 }
 
 .btn-check {
@@ -113,9 +114,8 @@ li {
   box-sizing: border-box;
   color: #4d5b9e;
   cursor: pointer;
-  height: 48px;
-  padding-left: 16px;
-  padding-right: 16px;
+  height: 50px;
+  padding: 0px 25px;
   margin-top: 50px;
   transition: box-shadow 0.15s, transform 0.15s;
   user-select: none;
