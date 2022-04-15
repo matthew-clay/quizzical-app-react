@@ -3,7 +3,7 @@ function welcome(props) {
     <div className="welcome">
       <h1 className="welcome-title">Quizzical App</h1>
       <span className="welcome-description">Some description if needed</span>
-      <button className="btn-start" onClick={props.handleStart}>
+      <button className="btn-start" onClick={props.handleClick}>
         Start Quiz
       </button>
     </div>
