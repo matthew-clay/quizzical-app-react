@@ -1,166 +1,95 @@
-import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
-import Welcome from "./component/Welcome";
-// import Quiz from "./component/Quiz";
-import Question from "./component/Question";
+import { useEffect, useState } from "react";
 import "./App.css";
-import { decode } from "html-entities";
+import Quiz from "./components/Quiz";
+import Welcome from "./components/Welcome";
 
 function App() {
-  const [welcome, setWelcome] = useState(true);
-  const [quizzes, setQuizzes] = useState([]);
-  const [newGame, setNewGame] = useState(false);
-  const [score, setScore] = useState(0);
+  const [isStart, setStart] = useState(false);
+  const [quizData, setQuizData] = useState([]);
+  const [selectedAnswers, setSelectedAnswer] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [score, setScore] = useState(0);
 
-  const handleClick = () => {
-    setWelcome((prev) => !prev);
+  // console.log("selected Ans:", selectedAnswers);
+  console.log("Quiz:", quizData);
+
+  const handleStart = () => {
+    setStart((oldValue) => !oldValue);
+  };
+
+  const onAnswerSelected = (quizId, answer) => {
+    const hasAnsweredBefore = selectedAnswers.find(
+      (selectedAnswer) => selectedAnswer.quizId === quizId
+    );
+    if (hasAnsweredBefore) {
+      const filtered = selectedAnswers.filter(
+        (selectedAnswer) => selectedAnswer.quizId !== quizId
+      );
+      return setSelectedAnswer([...filtered, { quizId, answer }]);
+    }
+    setSelectedAnswer([...selectedAnswers, { quizId, answer }]);
   };
 
   useEffect(() => {
-    fetch("https://opentdb.com/api.php?amount=5&type=multiple")
-      .then((res) => res.json())
-      .then((data) => setQuizzes(customizeAPIData(data.results)))
-      .catch((error) => alert("Error while fetching data:", error));
+    try {
+      fetch("https://opentdb.com/api.php?amount=5&type=multiple")
+        .then((res) => res.json())
+        .then((data) =>
+          setQuizData(
+            data.results.map((quiz) => ({
+              ...quiz,
+              id: nanoid(),
+              question: quiz.question,
+              answers: [...quiz.incorrect_answers, quiz.correct_answer],
+            }))
+          )
+        );
+    } catch (error) {
+      console.log("Fetch Error:", error);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newGame]);
+  }, [isStart]); // temporarily controls dependcies arr with boolean type later will fixed with new state
 
-  const customizeAPIData = (rawData) => {
-    const newQuizzes = rawData.map((quiz) => {
-      const answers = [...quiz.incorrect_answers, quiz.correct_answer];
-      return {
-        id: nanoid(),
-        question: decode(quiz.question),
-        correctAnswer: quiz.correct_answer,
-        answers: customizeAnswerFromQuiz(
-          answers,
-          quiz.correct_answer,
-          shuffledAnswer
-        ),
-      };
-    });
-    return newQuizzes;
-  };
-
-  const shuffledAnswer = (answers) => {
-    return answers.sort(() => Math.random() - 0.5);
-  };
-
-  const customizeAnswerFromQuiz = (ansArr, correctAnswer, callback) => {
-    const answers = callback(decode(ansArr));
-
-    return answers.map((answer) => ({
-      id: nanoid(),
-      answer: answer,
-      isCorrect: answer === correctAnswer,
-      isHeld: false,
-      heldCorrect: false,
-      heldIncorrect: false,
-      checked: false,
-    }));
-  };
-
-  const runHold = (questionId, answerId) => {
-    setQuizzes((prevQuizzes) =>
-      prevQuizzes.map((quiz) => {
-        if (quiz.id === questionId) {
-          const answerList = quiz.answers.map((answer) => {
-            console.log(answer.id === answerId || answer.isHeld);
-            if (answer.id === answerId || answer.isHeld) {
-              return {
-                ...answer,
-                isHeld: !answer.isHeld,
-              };
+  const handleCheckAnswers = (quizId) => {
+    return quizId.map((id) => {
+      setChecked((oldValue) => !oldValue);
+      quizData.map((quiz) => {
+        if (id === quiz.id) {
+          selectedAnswers.map((item) => {
+            if (item.answer === quiz.correct_answer) {
+              return setScore((oldScore) => oldScore + 1);
             } else {
-              return answer;
+              return score;
             }
           });
-          return {
-            ...quiz,
-            answers: answerList,
-          };
-        } else {
-          return quiz;
         }
-      })
-    );
+        return quiz;
+      });
+      return id;
+    });
   };
 
-  const checkAnswers = () => {
-    setQuizzes((prevQuizzes) =>
-      prevQuizzes.map((quiz) => {
-        const checkedAnswer = quiz.answers.map((answer) => {
-          if (answer.isHeld && !answer.correct) {
-            return {
-              ...answer,
-              heldIncorrect: true,
-              checked: true,
-            };
-          } else if (answer.isHeld && answer.correct) {
-            setScore((prevScore) => prevScore + 1);
-            return {
-              ...answer,
-              heldCorrect: true,
-              checked: true,
-            };
-          } else {
-            return {
-              ...answer,
-              checked: true,
-            };
-          }
-        });
-        return {
-          ...quiz,
-          answers: checkedAnswer,
-        };
-      })
-    );
-    setChecked(true);
-  };
-
-  const questionTags = quizzes.map((quiz) => {
-    return (
-      <Question
-        id={quiz.id}
-        key={quiz.id}
-        question={quiz.question}
-        answers={quiz.answers}
-        runHold={runHold}
-      />
-    );
-  });
-
-  const playNewGame = () => {
-    setNewGame((prevVal) => !prevVal);
+  const startNewGame = () => {
+    setStart((prevVal) => !prevVal);
     setChecked(false);
     setScore(0);
   };
 
   return (
     <section className="app">
-      {welcome ? (
-        <Welcome handleClick={handleClick} />
+      {isStart ? (
+        <Quiz
+          quizzes={quizData}
+          selectedAnswers={selectedAnswers}
+          onAnswerSelected={onAnswerSelected}
+          score={score}
+          checked={checked}
+          handleCheckAnswers={handleCheckAnswers}
+          startNewGame={startNewGame}
+        />
       ) : (
-        <main className="quiz-container">
-          {questionTags}
-          <div className="btn-container">
-            {checked ? (
-              <div>
-                <span className="score">
-                  You scored {score}/5 correct answers
-                </span>
-                <button className="btn mt" onClick={playNewGame}>
-                  Play again
-                </button>
-              </div>
-            ) : (
-              <button className="btn mt" onClick={checkAnswers}>
-                Check answers
-              </button>
-            )}
-          </div>
-        </main>
+        <Welcome handleStart={handleStart} />
       )}
     </section>
   );
